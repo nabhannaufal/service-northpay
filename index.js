@@ -55,6 +55,10 @@ const authenticate = (req, res, next) => {
   });
 };
 
+app.get("/", (req, res) => {
+  res.status(200).json({ message: "Welcome in The North Pay!!!" });
+});
+
 app.post("/register", async (req, res) => {
   const { username, password, email, phoneNumber } = req.body;
   try {
