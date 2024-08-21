@@ -1,0 +1,438 @@
+{
+	"info": {
+		"_postman_id": "ffb05708-fc90-46f9-8d6b-624bae2a76cb",
+		"name": "The North Pay",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "7665396"
+	},
+	"item": [
+		{
+			"name": "Register",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\": \"nabhan\",\n    \"password\": \"nabhan\",\n    \"email\": \"nabhan@mail.com\",\n    \"phoneNumber\": \"0818666041\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/register",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const jsonData = pm.response.json();",
+							"if (jsonData.token) { ",
+							"  pm.collectionVariables.set(\"token\", jsonData.token); ",
+							"}"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\": \"nabhan\",\n    \"password\": \"nabhan\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/login",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Change Password",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"oldPassword\": \"nabhan\",\n    \"newPassword\": \"naufal\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/change-password",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"change-password"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "TopUp Saldo",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const jsonData = pm.response.json();",
+							"pm.collectionVariables.set(\"parameters\", JSON.stringify(jsonData));",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"amount\": 30000\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/topup",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"topup"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Midtrans Notification",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{{parameters}}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/midtrans-notification",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"midtrans-notification"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Transfer",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"amount\": 10000,\n    \"recipientUsername\": \"naufal\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/transfer",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"transfer"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "List Contacts",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\": \"nabhan\",\n    \"password\": \"nocnihp\",\n    \"email\": \"nabhan@mail.com\",\n    \"phoneNumber\": \"0818666040\"\n\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/contact",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"contact"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Profile",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\": \"nabhan\",\n    \"password\": \"nocnihp\",\n    \"email\": \"nabhan@mail.com\",\n    \"phoneNumber\": \"0818666040\"\n\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/profile",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"profile"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "url",
+			"value": "http://localhost:8080",
+			"type": "string"
+		},
+		{
+			"key": "token",
+			"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NmM2MGFmNGQxOTUyNTRiYWRiODEwZDQiLCJpYXQiOjE3MjQyNTcyMDMsImV4cCI6MTcyNDI2MDgwM30.lXPYL-Ra4BfK18-Z3geA30eowQRAwJO_AsrT7lSS9uU",
+			"type": "string"
+		},
+		{
+			"key": "parameters",
+			"value": "{\n    \"transaction_time\": \"2024-08-22 00:32:38\",\n    \"gross_amount\": \"123123.00\",\n    \"currency\": \"IDR\",\n    \"order_id\": \"TOPUP-1724261558350-66c6182ab7f6254c14aa0d8f\",\n    \"payment_type\": \"qris\",\n    \"signature_key\": \"3ebb9a4ae76128f3b482398f92bc1a0f4f3a447b175cd2db7f57c6b40c7b79f225e5d6417ee1eabf768b6da55dd6f9e0469d4abf7d5bc5c21d5b2bdcc1572143\",\n    \"status_code\": \"201\",\n    \"transaction_id\": \"033dd48b-118f-491b-b577-149235fcb413\",\n    \"transaction_status\": \"pending\",\n    \"fraud_status\": \"accept\",\n    \"expiry_time\": \"2024-08-22 00:47:38\",\n    \"status_message\": \"Success, transaction is found\",\n    \"merchant_id\": \"G353672236\",\n    \"acquirer\": \"gopay\"\n}",
+			"type": "string"
+		}
+	]
+}

@@ -212,7 +212,7 @@ app.post("/midtrans-notification", express.raw({ type: "application/json" }), as
               $push: {
                 transactions: {
                   orderId,
-                  amount: grossAmount,
+                  amount: Number(grossAmount),
                   type: "topup",
                   timestamp: new Date(),
                 },
