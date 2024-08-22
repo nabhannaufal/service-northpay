@@ -13,7 +13,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"username\": \"nabhan\",\n    \"password\": \"nabhan\",\n    \"email\": \"nabhan@mail.com\",\n    \"phoneNumber\": \"0818666040\"\n}",
+					"raw": "{\n    \"username\": \"nabhan\",\n    \"password\": \"nabhan\",\n    \"fullName\": \"Nabhan Phincon\",\n    \"email\": \"nabhan@mail.com\",\n    \"phoneNumber\": \"0818666041\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -182,7 +182,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"amount\": 30000\n}",
+					"raw": "{\n    \"amount\": 200000\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -298,7 +298,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"amount\": 10000,\n    \"recipientUsername\": \"naufal\"\n}",
+					"raw": "{\n    \"amount\": 5000,\n    \"recipientUsername\": \"naufal\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -372,6 +372,33 @@
 			"response": []
 		},
 		{
+			"name": "History Transaction",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/history",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"history"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "Update Profile",
 			"request": {
 				"auth": {
@@ -391,17 +418,22 @@
 					"formdata": [
 						{
 							"key": "username",
-							"value": "halo",
+							"value": "nabhan",
 							"type": "text"
 						},
 						{
 							"key": "email",
-							"value": "halo@gmail.com",
+							"value": "nabhan@gmail.com",
 							"type": "text"
 						},
 						{
 							"key": "phoneNumber",
 							"value": "081229743370",
+							"type": "text"
+						},
+						{
+							"key": "fullName",
+							"value": "Nabhan Skuyy",
 							"type": "text"
 						},
 						{
