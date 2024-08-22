@@ -69,7 +69,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 app.get("/", (req, res) => {
-  res.status(200).json({ message: "Welcome in The North Pay!!!" });
+  res.status(200).json({ message: "Welcome in The North Pay!!!", description: "Test CICD!!" });
 });
 
 app.post("/register", async (req, res) => {
