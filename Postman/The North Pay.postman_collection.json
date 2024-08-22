@@ -13,7 +13,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"username\": \"nabhan\",\n    \"password\": \"nabhan\",\n    \"email\": \"nabhan@mail.com\",\n    \"phoneNumber\": \"0818666041\"\n}",
+					"raw": "{\n    \"username\": \"naufal\",\n    \"password\": \"naufal\",\n    \"email\": \"naufal@mail.com\",\n    \"phoneNumber\": \"0818666041\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -64,7 +64,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"username\": \"nabhan\",\n    \"password\": \"nabhan\"\n}",
+					"raw": "{\n    \"email\": \"naufal@mail.com\",\n    \"password\": \"naufal\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -432,6 +432,11 @@
 		{
 			"key": "parameters",
 			"value": "{\n    \"transaction_time\": \"2024-08-22 00:32:38\",\n    \"gross_amount\": \"123123.00\",\n    \"currency\": \"IDR\",\n    \"order_id\": \"TOPUP-1724261558350-66c6182ab7f6254c14aa0d8f\",\n    \"payment_type\": \"qris\",\n    \"signature_key\": \"3ebb9a4ae76128f3b482398f92bc1a0f4f3a447b175cd2db7f57c6b40c7b79f225e5d6417ee1eabf768b6da55dd6f9e0469d4abf7d5bc5c21d5b2bdcc1572143\",\n    \"status_code\": \"201\",\n    \"transaction_id\": \"033dd48b-118f-491b-b577-149235fcb413\",\n    \"transaction_status\": \"pending\",\n    \"fraud_status\": \"accept\",\n    \"expiry_time\": \"2024-08-22 00:47:38\",\n    \"status_message\": \"Success, transaction is found\",\n    \"merchant_id\": \"G353672236\",\n    \"acquirer\": \"gopay\"\n}",
+			"type": "string"
+		},
+		{
+			"key": "url_local",
+			"value": "http://localhost:8080",
 			"type": "string"
 		}
 	]
