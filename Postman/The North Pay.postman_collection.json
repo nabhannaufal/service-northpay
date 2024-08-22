@@ -319,9 +319,6 @@
 		},
 		{
 			"name": "List Contacts",
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
 			"request": {
 				"auth": {
 					"type": "bearer",
@@ -335,15 +332,6 @@
 				},
 				"method": "GET",
 				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n    \"username\": \"nabhan\",\n    \"password\": \"nocnihp\",\n    \"email\": \"nabhan@mail.com\",\n    \"phoneNumber\": \"0818666040\"\n\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
 				"url": {
 					"raw": "{{url}}/contact",
 					"host": [
@@ -358,9 +346,6 @@
 		},
 		{
 			"name": "Profile",
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
 			"request": {
 				"auth": {
 					"type": "bearer",
@@ -374,14 +359,57 @@
 				},
 				"method": "GET",
 				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n    \"username\": \"nabhan\",\n    \"password\": \"nocnihp\",\n    \"email\": \"nabhan@mail.com\",\n    \"phoneNumber\": \"0818666040\"\n\n}",
-					"options": {
-						"raw": {
-							"language": "json"
+				"url": {
+					"raw": "{{url}}/profile",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"profile"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Profile",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
 						}
-					}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "username",
+							"value": "halo",
+							"type": "text"
+						},
+						{
+							"key": "email",
+							"value": "halo@gmail.com",
+							"type": "text"
+						},
+						{
+							"key": "phoneNumber",
+							"value": "081229743370",
+							"type": "text"
+						},
+						{
+							"key": "avatar",
+							"type": "file",
+							"src": "/Users/phincon/Downloads/bg.jpg"
+						}
+					]
 				},
 				"url": {
 					"raw": "{{url}}/profile",

@@ -1,6 +1,7 @@
 const path = require("path");
 const express = require("express");
 const mongoose = require("mongoose");
+const multer = require("multer");
 const dotenv = require("dotenv");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
@@ -54,6 +55,18 @@ const authenticate = (req, res, next) => {
     next();
   });
 };
+
+// Middelware multer
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, PUBLIC_URL);
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+    cb(null, file.fieldname + "-" + uniqueSuffix + path.extname(file.originalname));
+  },
+});
+const upload = multer({ storage: storage });
 
 app.get("/", (req, res) => {
   res.status(200).json({ message: "Welcome in The North Pay!!!" });
@@ -142,6 +155,39 @@ app.get("/profile", authenticate, async (req, res) => {
     balance: user.balance,
     transactions: user.transactions,
   });
+});
+
+app.put("/profile", authenticate, upload.single("avatar"), async (req, res) => {
+  try {
+    const { username, email, phoneNumber } = req.body;
+    const user = await User.findById(req.user.userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    const existingUser = await User.findOne({
+      $or: [{ username }, { email }],
+      _id: { $ne: user._id },
+    });
+    if (existingUser) {
+      return res.status(400).json({ message: "Username or email already exists" });
+    }
+
+    user.username = username;
+    user.email = email;
+    user.phoneNumber = phoneNumber;
+
+    if (req.file) {
+      user.avatar = `${process.env.HOSTNAME}/${req.file.filename}`;
+    }
+
+    await user.save();
+    res.status(200).json({ message: "Profile updated successfully" });
+  } catch (error) {
+    console.error("Error updating profile:", error);
+    res.status(500).json({
+      message: "Internal server error",
+    });
+  }
 });
 
 app.get("/contact", authenticate, async (req, res) => {
