@@ -157,7 +157,7 @@ app.get("/profile", authenticate, async (req, res) => {
   });
 });
 
-app.put("/profile", authenticate, upload.single("avatar"), async (req, res) => {
+app.post("/profile", authenticate, upload.single("avatar"), async (req, res) => {
   try {
     const { username, email, phoneNumber } = req.body;
     const user = await User.findById(req.user.userId);

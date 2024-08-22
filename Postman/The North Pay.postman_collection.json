@@ -13,7 +13,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"username\": \"naufal\",\n    \"password\": \"naufal\",\n    \"email\": \"naufal@mail.com\",\n    \"phoneNumber\": \"0818666041\"\n}",
+					"raw": "{\n    \"username\": \"nabhan\",\n    \"password\": \"nabhan\",\n    \"email\": \"nabhan@mail.com\",\n    \"phoneNumber\": \"0818666040\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -64,7 +64,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"email\": \"naufal@mail.com\",\n    \"password\": \"naufal\"\n}",
+					"raw": "{\n    \"email\": \"nabhan@mail.com\",\n    \"password\": \"nabhan\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -384,7 +384,7 @@
 						}
 					]
 				},
-				"method": "PUT",
+				"method": "POST",
 				"header": [],
 				"body": {
 					"mode": "formdata",
