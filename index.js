@@ -62,12 +62,15 @@ app.get("/", (req, res) => {
 app.post("/register", async (req, res) => {
   const { username, password, email, phoneNumber } = req.body;
   try {
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
     const user = new User({
       username,
-      password,
+      password: hashedPassword,
       email,
       phoneNumber,
       avatar: `${process.env.HOSTNAME}/avatar.jpg`,
+      balance: 100000,
     });
     await user.save();
     res.status(201).json({ message: "User registered successfully" });
@@ -84,16 +87,21 @@ app.post("/register", async (req, res) => {
 });
 
 app.post("/login", async (req, res) => {
-  const { username, password } = req.body;
+  const { email, password } = req.body;
   try {
-    const user = await User.findOne({ username });
+    const user = await User.findOne({
+      $or: [{ username: email }, { email: email }],
+    });
+
     if (!user) {
-      return res.status(401).json({ message: "Invalid username or password" });
+      return res.status(401).json({ message: "Invalid username/email or password" });
     }
+
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(401).json({ message: "Invalid username or password" });
+      return res.status(401).json({ message: "Invalid username/email or password" });
     }
+
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
       expiresIn: process.env.JWT_EXPIRY || "1h",
     });
@@ -247,6 +255,10 @@ app.post("/transfer", authenticate, async (req, res) => {
 
     if (!recipient) {
       return res.status(404).json({ message: "Recipient not found" });
+    }
+
+    if (sender.username === recipientUsername) {
+      return res.status(400).json({ message: "You cannot send money to yourself" });
     }
 
     if (sender.balance < transferAmount) {
