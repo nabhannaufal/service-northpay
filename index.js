@@ -73,7 +73,7 @@ app.get("/", (req, res) => {
 });
 
 app.post("/register", async (req, res) => {
-  const { username, password, email, phoneNumber } = req.body;
+  const { username, password, email, phoneNumber, fullName } = req.body;
   try {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
@@ -82,6 +82,7 @@ app.post("/register", async (req, res) => {
       password: hashedPassword,
       email,
       phoneNumber,
+      fullName,
       avatar: `${process.env.HOSTNAME}/avatar.jpg`,
     });
     await user.save();
@@ -148,32 +149,49 @@ app.get("/profile", authenticate, async (req, res) => {
   const user = await User.findById(req.user.userId);
   res.status(200).json({
     name: user.username,
+    fullName: user.fullName,
     email: user.email,
     phoneNumber: user.phoneNumber,
     avatar: user.avatar,
     balance: user.balance,
-    transactions: user.transactions,
   });
 });
 
 app.post("/profile", authenticate, upload.single("avatar"), async (req, res) => {
   try {
-    const { username, email, phoneNumber } = req.body;
+    const { username, email, phoneNumber, fullName } = req.body;
     const user = await User.findById(req.user.userId);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
-    const existingUser = await User.findOne({
-      $or: [{ username }, { email }],
-      _id: { $ne: user._id },
-    });
-    if (existingUser) {
-      return res.status(400).json({ message: "Username or email already exists" });
+
+    if (username && username !== user.username) {
+      const existingUserByUsername = await User.findOne({ username, _id: { $ne: user._id } });
+      if (existingUserByUsername) {
+        return res.status(400).json({ message: "Username already exists" });
+      }
     }
 
-    user.username = username;
-    user.email = email;
-    user.phoneNumber = phoneNumber;
+    if (email && email !== user.email) {
+      const existingUserByEmail = await User.findOne({ email, _id: { $ne: user._id } });
+      if (existingUserByEmail) {
+        return res.status(400).json({ message: "Email already exists" });
+      }
+    }
+
+    if (username) {
+      user.username = username;
+    }
+    if (email) {
+      user.email = email;
+    }
+    if (phoneNumber) {
+      user.phoneNumber = phoneNumber;
+    }
+
+    if (fullName) {
+      user.fullName = fullName;
+    }
 
     if (req.file) {
       user.avatar = `${process.env.HOSTNAME}/${req.file.filename}`;
@@ -195,6 +213,7 @@ app.get("/contact", authenticate, async (req, res) => {
     const response = users.map((user) => ({
       id: user._id,
       name: user.username,
+      fullName: user.fullName,
       email: user.email,
       phoneNumber: user.phoneNumber,
       avatar: user.avatar,
@@ -238,6 +257,35 @@ app.post("/topup", authenticate, async (req, res) => {
   }
 });
 
+app.get("/history", authenticate, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const history = await Promise.all(
+      user.transactions.map(async (transaction) => {
+        const relatedUser = transaction.userId.equals(user._id) ? user : await User.findById(transaction.userId);
+
+        return {
+          orderId: transaction.orderId,
+          amount: transaction.amount,
+          type: transaction.type,
+          timestamp: transaction.timestamp,
+          name: relatedUser ? relatedUser.fullName : null,
+          avatar: relatedUser ? relatedUser.avatar : null,
+        };
+      })
+    );
+
+    res.status(200).json({ transaction: history });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
 app.post("/midtrans-notification", express.raw({ type: "application/json" }), async (req, res) => {
   try {
     let receivedJson = req.body;
@@ -265,6 +313,7 @@ app.post("/midtrans-notification", express.raw({ type: "application/json" }), as
               $push: {
                 transactions: {
                   orderId,
+                  userId: user._id,
                   amount: Number(grossAmount),
                   type: "topup",
                   timestamp: new Date(),
@@ -295,6 +344,7 @@ app.post("/transfer", authenticate, async (req, res) => {
       return res.status(400).json({ message: "Invalid amount" });
     }
 
+    const orderId = `TRANSFER-${Date.now()}-${user._id}`;
     const sender = await User.findById(req.user.userId);
     const recipient = await User.findOne({ username: recipientUsername });
 
@@ -314,8 +364,9 @@ app.post("/transfer", authenticate, async (req, res) => {
     sender.transactions.push({
       amount: -transferAmount,
       type: "transfer",
-      recipient: recipientUsername,
+      userId: recipient._id,
       timestamp: new Date(),
+      orderId,
     });
     await sender.save();
 
@@ -323,8 +374,9 @@ app.post("/transfer", authenticate, async (req, res) => {
     recipient.transactions.push({
       amount: transferAmount,
       type: "transfer",
-      sender: sender.username,
+      userId: sender._id,
       timestamp: new Date(),
+      orderId,
     });
     await recipient.save();
 
