@@ -344,7 +344,7 @@ app.post("/transfer", authenticate, async (req, res) => {
       return res.status(400).json({ message: "Invalid amount" });
     }
 
-    const orderId = `TRANSFER-${Date.now()}-${user._id}`;
+    const orderId = `TRANSFER-${Date.now()}-${req.user.userId}`;
     const sender = await User.findById(req.user.userId);
     const recipient = await User.findOne({ username: recipientUsername });
 
