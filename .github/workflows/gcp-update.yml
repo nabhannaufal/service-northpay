@@ -12,6 +12,13 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
+      - name: Print Secrets (for debugging)
+        run: |
+          echo "GCP_VM_IP: ${{ secrets.GCP_VM_IP }}"
+          echo "GCP_VM_USERNAME: ${{ secrets.GCP_VM_USERNAME }}"
+          # Avoid printing the actual SSH key for security reasons
+          echo "GCP_VM_SSH_KEY is set: ${{ secrets.GCP_VM_SSH_KEY != '' }}"
+
       - name: Execute Script on GCP Instance
         uses: appleboy/ssh-action@master
         with:
