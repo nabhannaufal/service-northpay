@@ -83,7 +83,6 @@ app.post("/register", async (req, res) => {
       email,
       phoneNumber,
       avatar: `${process.env.HOSTNAME}/avatar.jpg`,
-      balance: 100000,
     });
     await user.save();
     res.status(201).json({ message: "User registered successfully" });
