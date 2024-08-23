@@ -47,13 +47,13 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{url}}/topup-finish/a1597af6-8294-481c-a5bb-23d7ba7aca63",
+							"raw": "{{url}}/topup-finish/6bebe0d4-a67a-4dd6-9bab-6cc09e3ebc90",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"topup-finish",
-								"a1597af6-8294-481c-a5bb-23d7ba7aca63"
+								"6bebe0d4-a67a-4dd6-9bab-6cc09e3ebc90"
 							]
 						}
 					},
@@ -180,7 +180,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"email\": \"naufal@mail.com\",\n    \"password\": \"naufal\"\n}",
+					"raw": "{\n    \"email\": \"nabhan@mail.com\",\n    \"password\": \"nabhan\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -296,7 +296,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"amount\": 100000\n}",
+					"raw": "{\n    \"amount\": 1000000\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -310,6 +310,125 @@
 					],
 					"path": [
 						"topup"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Request Saldo",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const jsonData = pm.response.json();",
+							"if (jsonData.qrCodeData) { ",
+							"  pm.collectionVariables.set(\"qrCodeData\", jsonData.qrCodeData); ",
+							"}"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"amount\": 300000\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/request",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"request"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Pay Request Saldo",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"qrCodeData\": \"{{qrCodeData}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/pay",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"pay"
 					]
 				}
 			},
@@ -412,7 +531,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"amount\": 50000,\n    \"recipientUsername\": \"nabhan\"\n}",
+					"raw": "{\n    \"amount\": 5000,\n    \"recipientUsername\": \"naufal\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -611,6 +730,11 @@
 		{
 			"key": "url_local",
 			"value": "http://localhost:8080",
+			"type": "string"
+		},
+		{
+			"key": "qrCodeData",
+			"value": "northpay_request:66c80a056088a16b671e9863:100000",
 			"type": "string"
 		}
 	]
