@@ -7,13 +7,129 @@
 	},
 	"item": [
 		{
+			"name": "V1 Topup",
+			"item": [
+				{
+					"name": "TopUp Saldo Finish",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/topup-finish/a1597af6-8294-481c-a5bb-23d7ba7aca63",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"topup-finish",
+								"a1597af6-8294-481c-a5bb-23d7ba7aca63"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "TopUp QRIS",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const jsonData = pm.response.json();",
+									"pm.collectionVariables.set(\"parameters\", JSON.stringify(jsonData));",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"amount\": 1000000\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/v2/topup",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v2",
+								"topup"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
 			"name": "Register",
 			"request": {
 				"method": "POST",
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"username\": \"naufal\",\n    \"password\": \"naufal\",\n    \"fullName\": \"Naufal Phincon\",\n    \"email\": \"naufal@mail.com\",\n    \"phoneNumber\": \"0818666042\"\n}",
+					"raw": "{\n    \"username\": \"nabhan\",\n    \"password\": \"nabhan\",\n    \"fullName\": \"Nabhan Phincon\",\n    \"email\": \"nabhan@mail.com\",\n    \"phoneNumber\": \"0818666041\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -148,8 +264,6 @@
 					"listen": "test",
 					"script": {
 						"exec": [
-							"const jsonData = pm.response.json();",
-							"pm.collectionVariables.set(\"parameters\", JSON.stringify(jsonData));",
 							""
 						],
 						"type": "text/javascript",
@@ -182,7 +296,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"amount\": 24000\n}",
+					"raw": "{\n    \"amount\": 100000\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -298,7 +412,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"amount\": 5000,\n    \"recipientUsername\": \"nabhan\"\n}",
+					"raw": "{\n    \"amount\": 50000,\n    \"recipientUsername\": \"nabhan\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
