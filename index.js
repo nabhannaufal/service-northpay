@@ -5,7 +5,7 @@ const multer = require("multer");
 const dotenv = require("dotenv");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const { CoreApi } = require("midtrans-client");
+const { CoreApi, Snap } = require("midtrans-client");
 
 dotenv.config();
 const PUBLIC_URL = process.env.PUBLIC_URL || path.join(__dirname, "public");
@@ -26,6 +26,11 @@ const core = new CoreApi({
   isProduction: false, // Set to true for production environment
   serverKey: process.env.MIDTRANS_SERVER_KEY,
   clientKey: process.env.MIDTRANS_CLIENT_KEY,
+});
+
+const snap = new Snap({
+  isProduction: false, // Set to true for production environment
+  serverKey: process.env.MIDTRANS_SERVER_KEY,
 });
 
 // Middleware to verify JWT
@@ -249,6 +254,90 @@ app.post("/topup", authenticate, async (req, res) => {
     }
     const user = await User.findById(req.user.userId);
     const parameter = {
+      transaction_details: {
+        order_id: `TOPUP-${Date.now()}-${user._id}`,
+        gross_amount: amount,
+      },
+      credit_card: {
+        secure: true,
+      },
+      customer_details: {
+        first_name: user.username,
+        email: user.email,
+        phone: user.phoneNumber,
+      },
+    };
+    const transaction = await snap.createTransaction(parameter);
+    res.status(200).json({
+      status: "sucess",
+      redirect_url: transaction.redirect_url,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+app.get("/topup-finish/:trxId", async (req, res) => {
+  try {
+    const { trxId } = req.params;
+    if (!trxId) {
+      return res.status(400).json({ message: "Missing transaction_id" });
+    }
+    const notification = await snap.transaction.status(trxId);
+
+    if (notification.transaction_status === "settlement") {
+      const orderId = notification.order_id;
+      const grossAmount = notification.gross_amount;
+
+      // Find the user and check if the transaction already exists
+      const user = await User.findOne({ _id: orderId.split("-")[2] });
+
+      if (user) {
+        const existingTransaction = user.transactions.find((transaction) => transaction.orderId === orderId);
+
+        if (!existingTransaction) {
+          await User.findOneAndUpdate(
+            { _id: orderId.split("-")[2] },
+            {
+              $inc: { balance: grossAmount },
+              $push: {
+                transactions: {
+                  orderId,
+                  userId: user._id,
+                  amount: Number(grossAmount),
+                  type: "topup",
+                  timestamp: new Date(),
+                },
+              },
+            }
+          );
+        } else {
+          console.log("Duplicate transaction detected. Skipping update.");
+        }
+      }
+    }
+
+    res.status(200).json(notification);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+app.post("/v2/topup", authenticate, async (req, res) => {
+  try {
+    let amount = req.body.amount;
+    if (!amount) {
+      return res.status(400).json({ message: "Amount is required" });
+    }
+    amount = parseInt(amount, 10);
+
+    if (isNaN(amount) || amount <= 0) {
+      return res.status(400).json({ message: "Invalid amount" });
+    }
+    const user = await User.findById(req.user.userId);
+    const parameter = {
       payment_type: "qris",
       transaction_details: {
         order_id: `TOPUP-${Date.now()}-${user._id}`,
@@ -391,7 +480,13 @@ app.post("/transfer", authenticate, async (req, res) => {
     });
     await recipient.save();
 
-    res.status(200).json({ message: "Transfer successful" });
+    res.status(200).json({
+      orderId,
+      amount: formatCurrency(transferAmount),
+      type: "transfer",
+      timestamp: new Date(),
+      name: recipient.username,
+    });
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Internal server error" });
