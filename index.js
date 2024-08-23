@@ -1,10 +1,13 @@
 const path = require("path");
 const express = require("express");
+const fs = require("fs");
 const mongoose = require("mongoose");
 const multer = require("multer");
+const moment = require("moment");
 const dotenv = require("dotenv");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const QRCode = require("qrcode");
 const { CoreApi, Snap } = require("midtrans-client");
 
 dotenv.config();
@@ -20,6 +23,9 @@ mongoose
   .catch((err) => console.error("Error connecting to MongoDB:", err));
 
 const User = require("./model/user");
+
+// Set the locale to Indonesian
+moment.locale("id");
 
 // Midtrans configuration
 const core = new CoreApi({
@@ -82,6 +88,15 @@ const formatCurrency = (amount) => {
   const formattedIntegerPart = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
   const formattedAmount = decimalPart ? `${formattedIntegerPart},${decimalPart}` : formattedIntegerPart;
   return `IDR ${formattedAmount}`;
+};
+
+// create trxid
+const createTransactionId = () => {
+  const appId = "A302";
+  const timeStamp = moment().format("YYMMDDHHmmss");
+  const changeableDigit = "0";
+
+  return [appId, timeStamp, changeableDigit].join("");
 };
 
 app.get("/", (req, res) => {
@@ -271,6 +286,7 @@ app.post("/topup", authenticate, async (req, res) => {
     res.status(200).json({
       status: "sucess",
       redirect_url: transaction.redirect_url,
+      token: transaction.token,
     });
   } catch (error) {
     console.log(error);
@@ -305,9 +321,10 @@ app.get("/topup-finish/:trxId", async (req, res) => {
                 transactions: {
                   orderId,
                   userId: user._id,
+                  transaction_id: createTransactionId(),
                   amount: Number(grossAmount),
                   type: "topup",
-                  timestamp: new Date(),
+                  timestamp: moment(new Date()).format("DD MMMM YYYY, HH:mm"),
                 },
               },
             }
@@ -370,6 +387,7 @@ app.get("/history", authenticate, async (req, res) => {
 
         return {
           orderId: transaction.orderId,
+          transaction_id: transaction.transaction_id,
           amount: formatCurrency(transaction.amount),
           type: transaction.type,
           timestamp: transaction.timestamp,
@@ -414,9 +432,10 @@ app.post("/midtrans-notification", express.raw({ type: "application/json" }), as
                 transactions: {
                   orderId,
                   userId: user._id,
+                  transaction_id: createTransactionId(),
                   amount: Number(grossAmount),
                   type: "topup",
-                  timestamp: new Date(),
+                  timestamp: moment(new Date()).format("DD MMMM YYYY, HH:mm"),
                 },
               },
             }
@@ -447,6 +466,7 @@ app.post("/transfer", authenticate, async (req, res) => {
     const orderId = `TRANSFER-${Date.now()}-${req.user.userId}`;
     const sender = await User.findById(req.user.userId);
     const recipient = await User.findOne({ username: recipientUsername });
+    const transactionId = createTransactionId();
 
     if (!recipient) {
       return res.status(404).json({ message: "Recipient not found" });
@@ -464,8 +484,9 @@ app.post("/transfer", authenticate, async (req, res) => {
     sender.transactions.push({
       amount: -transferAmount,
       type: "transfer",
+      transaction_id: transactionId,
       userId: recipient._id,
-      timestamp: new Date(),
+      timestamp: moment(new Date()).format("DD MMMM YYYY, HH:mm"),
       orderId,
     });
     await sender.save();
@@ -474,8 +495,9 @@ app.post("/transfer", authenticate, async (req, res) => {
     recipient.transactions.push({
       amount: transferAmount,
       type: "transfer",
+      transaction_id: transactionId,
       userId: sender._id,
-      timestamp: new Date(),
+      timestamp: moment(new Date()).format("DD MMMM YYYY, HH:mm"),
       orderId,
     });
     await recipient.save();
@@ -483,12 +505,114 @@ app.post("/transfer", authenticate, async (req, res) => {
     res.status(200).json({
       orderId,
       amount: formatCurrency(transferAmount),
+      transaction_id: transactionId,
       type: "transfer",
-      timestamp: new Date(),
+      timestamp: moment(new Date()).format("DD MMMM YYYY, HH:mm"),
       name: recipient.username,
     });
   } catch (error) {
     console.log(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+app.post("/request", authenticate, async (req, res) => {
+  try {
+    let amount = req.body.amount;
+    if (!amount) {
+      return res.status(400).json({ message: "Amount is required" });
+    }
+    amount = parseInt(amount, 10);
+
+    if (isNaN(amount) || amount <= 0) {
+      return res.status(400).json({ message: "Invalid amount" });
+    }
+
+    const user = await User.findById(req.user.userId);
+    const qrCodeData = `northpay_request:${user._id}:${amount}`;
+
+    const qrCodeFilename = `qr-${user._id}-${Date.now()}.png`;
+    const qrCodeFilePath = path.join(PUBLIC_URL, qrCodeFilename);
+
+    await QRCode.toFile(qrCodeFilePath, qrCodeData, { errorCorrectionLevel: "H" });
+
+    const qrCodeImageUrl = `${process.env.HOSTNAME}/${qrCodeFilename}`;
+
+    res.status(200).json({
+      qrCodeUrl: qrCodeImageUrl,
+      amount: formatCurrency(amount),
+      qrCodeData,
+    });
+  } catch (error) {
+    console.error("Error generating payment request:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+app.post("/pay", authenticate, async (req, res) => {
+  try {
+    const { qrCodeData } = req.body;
+
+    if (!qrCodeData) {
+      return res.status(400).json({ message: "QR code data is required" });
+    }
+
+    const [prefix, recipientId, amountString] = qrCodeData.split(":");
+    const amount = parseInt(amountString, 10);
+
+    if (prefix !== "northpay_request" || isNaN(amount) || amount <= 0) {
+      return res.status(400).json({ message: "Invalid QR code" });
+    }
+
+    const payer = await User.findById(req.user.userId);
+    const recipient = await User.findById(recipientId);
+
+    if (!recipient) {
+      return res.status(404).json({ message: "Recipient not found" });
+    }
+
+    if (payer.username === recipient.username) {
+      return res.status(400).json({ message: "You cannot pay to yourself" });
+    }
+
+    if (payer.balance < amount) {
+      return res.status(400).json({ message: "Insufficient balance" });
+    }
+
+    payer.balance -= amount;
+    recipient.balance += amount;
+
+    const orderId = `TRANSFER-${Date.now()}-${payer._id}`;
+    const transactionId = createTransactionId();
+
+    payer.transactions.push({
+      orderId,
+      amount: -amount,
+      type: "transfer",
+      userId: recipient._id,
+      transaction_id: transactionId,
+      timestamp: moment(new Date()).format("DD MMMM YYYY, HH:mm"),
+    });
+
+    recipient.transactions.push({
+      orderId,
+      amount: amount,
+      type: "transfer",
+      userId: payer._id,
+      transaction_id: transactionId,
+      timestamp: moment(new Date()).format("DD MMMM YYYY, HH:mm"),
+    });
+
+    await payer.save();
+    await recipient.save();
+
+    res.status(200).json({
+      message: "Payment successful",
+      amount: formatCurrency(amount),
+      recipient: recipient.username,
+    });
+  } catch (error) {
+    console.error("Error processing payment:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 });
