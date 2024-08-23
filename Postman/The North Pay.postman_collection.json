@@ -13,7 +13,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"username\": \"nabhan\",\n    \"password\": \"nabhan\",\n    \"fullName\": \"Nabhan Phincon\",\n    \"email\": \"nabhan@mail.com\",\n    \"phoneNumber\": \"0818666041\"\n}",
+					"raw": "{\n    \"username\": \"naufal\",\n    \"password\": \"naufal\",\n    \"fullName\": \"Naufal Phincon\",\n    \"email\": \"naufal@mail.com\",\n    \"phoneNumber\": \"0818666042\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -64,7 +64,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"email\": \"nabhan@mail.com\",\n    \"password\": \"nabhan\"\n}",
+					"raw": "{\n    \"email\": \"naufal@mail.com\",\n    \"password\": \"naufal\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -182,7 +182,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"amount\": 200000\n}",
+					"raw": "{\n    \"amount\": 24000\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -298,7 +298,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"amount\": 5000,\n    \"recipientUsername\": \"naufal\"\n}",
+					"raw": "{\n    \"amount\": 5000,\n    \"recipientUsername\": \"nabhan\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -444,12 +444,12 @@
 					]
 				},
 				"url": {
-					"raw": "{{url}}/profile",
+					"raw": "{{url}}/update-profile",
 					"host": [
 						"{{url}}"
 					],
 					"path": [
-						"profile"
+						"update-profile"
 					]
 				}
 			},

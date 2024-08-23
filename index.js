@@ -168,7 +168,7 @@ app.get("/profile", authenticate, async (req, res) => {
   });
 });
 
-app.post("/profile", authenticate, upload.single("avatar"), async (req, res) => {
+app.post("/update-profile", authenticate, upload.single("avatar"), async (req, res) => {
   try {
     const { username, email, phoneNumber, fullName } = req.body;
     const user = await User.findById(req.user.userId);
