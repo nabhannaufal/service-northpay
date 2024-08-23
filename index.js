@@ -68,6 +68,17 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage: storage });
 
+// formatter
+const formatCurrency = (amount) => {
+  const amountString = amount.toString();
+  const parts = amountString.split(".");
+  let integerPart = parts[0];
+  const decimalPart = parts[1] || "";
+  const formattedIntegerPart = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  const formattedAmount = decimalPart ? `${formattedIntegerPart},${decimalPart}` : formattedIntegerPart;
+  return `IDR ${formattedAmount}`;
+};
+
 app.get("/", (req, res) => {
   res.status(200).json({ status: "00000", message: "Welcome in The North Pay!!!", description: "Test CICD" });
 });
@@ -153,7 +164,7 @@ app.get("/profile", authenticate, async (req, res) => {
     email: user.email,
     phoneNumber: user.phoneNumber,
     avatar: user.avatar,
-    balance: user.balance,
+    balance: formatCurrency(user.balance),
   });
 });
 
@@ -270,7 +281,7 @@ app.get("/history", authenticate, async (req, res) => {
 
         return {
           orderId: transaction.orderId,
-          amount: transaction.amount,
+          amount: formatCurrency(transaction.amount),
           type: transaction.type,
           timestamp: transaction.timestamp,
           name: relatedUser ? relatedUser.fullName : null,
