@@ -283,20 +283,13 @@
 			],
 			"request": {
 				"auth": {
-					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{token}}",
-							"type": "string"
-						}
-					]
+					"type": "noauth"
 				},
 				"method": "POST",
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"email\": \"nabhan@mail.com\",\n    \"newPassword\": \"nabhannew\"\n}",
+					"raw": "{\n    \"email\": \"nabhan@mail.com\",\n    \"password\": \"nabhannew\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
