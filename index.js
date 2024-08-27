@@ -167,7 +167,28 @@ app.post("/change-password", authenticate, async (req, res) => {
     if (!isMatch) {
       return res.status(401).json({ message: "Invalid old password" });
     }
-    user.password = newPassword;
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
+    user.password = hashedPassword;
+    await user.save();
+    res.status(200).json({ message: "Password changed successfully" });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+app.post("/forgot-password", async (req, res) => {
+  const { email, password } = req.body;
+  try {
+    const user = await User.findOne({ email: email });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+    user.password = hashedPassword;
     await user.save();
     res.status(200).json({ message: "Password changed successfully" });
   } catch (error) {
@@ -268,9 +289,10 @@ app.post("/topup", authenticate, async (req, res) => {
       return res.status(400).json({ message: "Invalid amount" });
     }
     const user = await User.findById(req.user.userId);
+    const order_id = `TOPUP-${Date.now()}-${user._id}`;
     const parameter = {
       transaction_details: {
-        order_id: `TOPUP-${Date.now()}-${user._id}`,
+        order_id: order_id,
         gross_amount: amount,
       },
       credit_card: {
@@ -287,6 +309,11 @@ app.post("/topup", authenticate, async (req, res) => {
       status: "sucess",
       redirect_url: transaction.redirect_url,
       token: transaction.token,
+      name: user.username,
+      timestamp: moment(new Date()).format("DD MMMM YYYY, HH:mm"),
+      order_id: order_id,
+      amount: formatCurrency(amount),
+      type: "topup",
     });
   } catch (error) {
     console.log(error);
@@ -583,6 +610,7 @@ app.post("/pay", authenticate, async (req, res) => {
     recipient.balance += amount;
 
     const orderId = `TRANSFER-${Date.now()}-${payer._id}`;
+    const timestamp = moment(new Date()).format("DD MMMM YYYY, HH:mm");
     const transactionId = createTransactionId();
 
     payer.transactions.push({
@@ -591,7 +619,7 @@ app.post("/pay", authenticate, async (req, res) => {
       type: "transfer",
       userId: recipient._id,
       transaction_id: transactionId,
-      timestamp: moment(new Date()).format("DD MMMM YYYY, HH:mm"),
+      timestamp,
     });
 
     recipient.transactions.push({
@@ -600,7 +628,7 @@ app.post("/pay", authenticate, async (req, res) => {
       type: "transfer",
       userId: payer._id,
       transaction_id: transactionId,
-      timestamp: moment(new Date()).format("DD MMMM YYYY, HH:mm"),
+      timestamp,
     });
 
     await payer.save();
@@ -608,7 +636,10 @@ app.post("/pay", authenticate, async (req, res) => {
 
     res.status(200).json({
       message: "Payment successful",
+      type: "transfer",
       amount: formatCurrency(amount),
+      timestamp,
+      transaction_id: transactionId,
       recipient: recipient.username,
     });
   } catch (error) {

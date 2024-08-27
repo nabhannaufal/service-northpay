@@ -47,13 +47,13 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{url}}/topup-finish/6bebe0d4-a67a-4dd6-9bab-6cc09e3ebc90",
+							"raw": "{{url}}/topup-finish/22b5d841-4bcd-4d29-9fa0-06518ac7a426",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"topup-finish",
-								"6bebe0d4-a67a-4dd6-9bab-6cc09e3ebc90"
+								"22b5d841-4bcd-4d29-9fa0-06518ac7a426"
 							]
 						}
 					},
@@ -129,7 +129,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"username\": \"nabhan\",\n    \"password\": \"nabhan\",\n    \"fullName\": \"Nabhan Phincon\",\n    \"email\": \"nabhan@mail.com\",\n    \"phoneNumber\": \"0818666041\"\n}",
+					"raw": "{\n    \"username\": \"rama\",\n    \"password\": \"rama\",\n    \"fullName\": \"rama Phincon\",\n    \"email\": \"rama@mail.com\",\n    \"phoneNumber\": \"0818666043\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -180,7 +180,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"email\": \"nabhan@mail.com\",\n    \"password\": \"nabhan\"\n}",
+					"raw": "{\n    \"email\": \"nabhan@mail.com\",\n    \"password\": \"nabhannew\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -238,7 +238,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"oldPassword\": \"nabhan\",\n    \"newPassword\": \"naufal\"\n}",
+					"raw": "{\n    \"oldPassword\": \"rama\",\n    \"newPassword\": \"ramanew\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -252,6 +252,64 @@
 					],
 					"path": [
 						"change-password"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Forgot Password (Unsafe)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\": \"nabhan@mail.com\",\n    \"newPassword\": \"nabhannew\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/forgot-password",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"forgot-password"
 					]
 				}
 			},
@@ -296,7 +354,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"amount\": 1000000\n}",
+					"raw": "{\n    \"amount\": 100000\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -357,7 +415,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"amount\": 300000\n}",
+					"raw": "{\n    \"amount\": 1000\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -531,7 +589,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"amount\": 5000,\n    \"recipientUsername\": \"naufal\"\n}",
+					"raw": "{\n    \"amount\": 5000,\n    \"recipientUsername\": \"nabhan\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
